@@ -1,0 +1,37 @@
+{
+  "name": "busybody",
+  "description": "Simple IPC library",
+  "version": "0.1.0",
+  "homepage": "https://github.com/goliatone/busybody",
+  "author": {
+    "name": "goliatone",
+    "email": "hello@goliatone.com",
+    "url": "http://goliatone.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/goliatone/busybody.git"
+  },
+  "bugs": {
+    "url": "https://github.com/goliatone/busybody/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/goliatone/busybody/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "scripts": {
+    "test": "npm test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt-contrib-watch": "~0.2.0"
+  },
+  "keywords": []
+}
