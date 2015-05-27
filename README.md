@@ -2,6 +2,53 @@
 
 Simple IPC library
 
+Client:Node
+Server:Bridge
+
+Server should be able to connect on a stateless manner, we have a Unix socket path, and if the file is there, we move on. Else we make new connection.
+
+http://xathrya.web.id/blog/2013/10/21/nodejs-unix-sockets/
+
+
+http://stackoverflow.com/questions/16178239/gracefully-shutdown-unix-socket-server-on-nodejs-running-under-forever
+>I suggest you clean up on start. When you get EADDRINUSE, try to connect to the socket. If the socket connection succeeds, another server is running and so this instance should exit. If the connection fails then it is safe to unlink the socket file and create a new one.
+
+```js
+var fs = require('fs');
+var net = require('net');
+var server = net.createServer(function(c) { //'connection' listener
+    console.log('server connected');
+    c.on('end', function() {
+        console.log('server disconnected');
+    });
+    c.write('hello\r\n');
+    c.pipe(c);
+});
+
+server.on('error', function (e) {
+    if (e.code == 'EADDRINUSE') {
+        var clientSocket = new net.Socket();
+        clientSocket.on('error', function(e) { // handle error trying to talk to server
+            if (e.code == 'ECONNREFUSED') {  // No other server listening
+                fs.unlinkSync('/tmp/app-monitor.sock');
+                server.listen('/tmp/app-monitor.sock', function() { //'listening' listener
+                    console.log('server recovered');
+                });
+            }
+        });
+        clientSocket.connect({path: '/tmp/app-monitor.sock'}, function() { 
+            console.log('Server running, giving up...');
+            process.exit();
+        });
+    }
+});
+
+server.listen('/tmp/app-monitor.sock', function() { //'listening' listener
+    console.log('server bound');
+});
+```
+
+
 ## Getting Started
 Install the module with: `npm install busybody`
 
