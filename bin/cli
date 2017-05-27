@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+'use strict'
+
+const program = require('commander');
+const pkg = require('../package');
+const budybody = require('../');
+const log = require('modlog')('busybody');
+
+const PORT = require('..').DEFAULT_PORT;
+
+program
+    .version(pkg.version)
+    .option('-b, --bridge [bindaddr]', 'run a bridge')
+    .parse(process.argv);
+
+if (program.bridge) {
+    log.info('initializing bridge');
+
+    var bindaddr = program.bridge;
+
+    if (bindaddr === true) {
+        bindaddr = `127.0.0.1:${PORT}`;
+    }
+
+    var _tmp = bindaddr.split(':');
+    var cfg = {
+        host: _tmp[0],
+        port: _tmp[1]
+    };
+    cfg = {path: '/tmp/kaka.sock'};
+
+    var b = budybody.createBridge(cfg, function (err) {
+        if (err) {
+            log.error(err.message || err)
+            process.exit(1)
+            return
+        }
+        log.info('bridge is now listening on %s', bindaddr);
+    });
+
+    process.once('SIGINT', function () {
+        log.info('received SIGINT signal, closing bridge...');
+        b.close();
+        process.exit(0);
+    });
+
+} else {
+    program.help();
+}
