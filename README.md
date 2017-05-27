@@ -2,8 +2,15 @@
 
 Simple IPC library
 
+This requires a bridge to connect all nodes. The bridge can reside in any process.
+
 Client:Node
 Server:Bridge
+
+IPC Transports:
+Unix Socket
+TCP
+
 
 Server should be able to connect on a stateless manner, we have a Unix socket path, and if the file is there, we move on. Else we make new connection.
 
@@ -36,7 +43,7 @@ server.on('error', function (e) {
                 });
             }
         });
-        clientSocket.connect({path: '/tmp/app-monitor.sock'}, function() { 
+        clientSocket.connect({path: '/tmp/app-monitor.sock'}, function() {
             console.log('Server running, giving up...');
             process.exit();
         });
@@ -48,6 +55,7 @@ server.listen('/tmp/app-monitor.sock', function() { //'listening' listener
 });
 ```
 
+https://www.npmjs.com/package/nats
 
 ## Getting Started
 Install the module with: `npm install busybody`
