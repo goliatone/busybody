@@ -26,17 +26,21 @@
     "node": ">= 0.10.0"
   },
   "scripts": {
-    "test": "npm test"
+    "test": "NODE_ENV=testing mocha ./test/*test.js"
   },
-  "devDependencies": {
-    "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-nodeunit": "~0.1.2",
-    "grunt-contrib-watch": "~0.2.0"
-  },
-  "keywords": ["ipc","unix", "socket", "communication", "events"],
+  "devDependencies": {},
+  "keywords": [
+    "ipc",
+    "unix",
+    "socket",
+    "communication",
+    "events"
+  ],
   "dependencies": {
-    "uuid": "^2.0.1",
     "debug": "^2.1.3",
-    "lodash": "^3.7.0"
+    "gextend": "^0.3.0",
+    "gkeypath": "^0.7.0",
+    "lodash": "^3.7.0",
+    "uuid": "^2.0.1"
   }
 }
