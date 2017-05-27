@@ -2,6 +2,9 @@
 
 const util = require('util');
 
+exports.DEFAULT_PORT = 8221;
+
+
 const Node = exports.Node = require('./lib/node');
 
 exports.createNode = function (a, b, c) {
@@ -14,6 +17,7 @@ const Bridge = exports.Bridge = require('./lib/bridge');
 exports.createBridge = function (a, b) {
     return new Bridge(a, b);
 };
+
 
 exports.Node = Node;
 exports.Bridge = Bridge;
