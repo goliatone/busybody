@@ -3,7 +3,7 @@
 
 const program = require('commander');
 const pkg = require('../package');
-const budybody = require('../');
+const busybody = require('../');
 const log = require('modlog')('busy');
 
 const PORT = require('..').DEFAULT_PORT;
@@ -11,6 +11,9 @@ const PORT = require('..').DEFAULT_PORT;
 program
     .version(pkg.version)
     .option('-b, --bridge [bindaddr]', 'run a bridge')
+    .option('-n, --node [bindaddr]', 'run a node')
+    .option('-a, --action <action>', 'action tell or shout')
+    .option('-m, --message <message>', 'message')
     .parse(process.argv);
 
 if (program.bridge) {
@@ -40,7 +43,7 @@ if (program.bridge) {
         cfg = {path: bindaddr};
     }
 
-    var b = budybody.createBridge(cfg, function (err) {
+    var b = busybody.createBridge(cfg, function (err) {
         if (err) {
             log.error(err.message || err);
             return process.exit(1);
@@ -53,7 +56,26 @@ if (program.bridge) {
         b.close();
         process.exit(0);
     });
+} else if(program.node){
+    let config = {
+        path: '/tmp/kiko2.sock'
+    };
 
+    let node = busybody.createNode(config, (err)=>{
+        if (err) {
+            log.error(err.message || err);
+            return process.exit(1);
+        }
+        log.info('node is online as ', config);
+    });
+    var target = program.node;
+    var message = program.message;
+    var action = program.action;
+
+    node[action](target, message, (err, message)=>{
+        console.log(err, message);
+        process.exit(0);
+    });
 } else {
     program.help();
 }
