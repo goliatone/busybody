@@ -4,7 +4,7 @@
 const program = require('commander');
 const pkg = require('../package');
 const budybody = require('../');
-const log = require('modlog')('busybody');
+const log = require('modlog')('busy');
 
 const PORT = require('..').DEFAULT_PORT;
 
@@ -18,24 +18,34 @@ if (program.bridge) {
 
     var bindaddr = program.bridge;
 
+    let cfg = {};
+
+    /*
+     * We just called the command with
+     * the `--bridge` flag and no value.
+     */
     if (bindaddr === true) {
         bindaddr = `127.0.0.1:${PORT}`;
     }
 
-    var _tmp = bindaddr.split(':');
-    var cfg = {
-        host: _tmp[0],
-        port: _tmp[1]
-    };
-    cfg = {path: '/tmp/kaka.sock'};
+    if(bindaddr.indexOf(':') !== -1) {
+        let _tmp = bindaddr.split(':');
+        cfg = {
+            host: _tmp[0],
+            port: _tmp[1]
+        };
+    }
+
+    if(bindaddr.indexOf('.sock') !== -1) {
+        cfg = {path: bindaddr};
+    }
 
     var b = budybody.createBridge(cfg, function (err) {
         if (err) {
-            log.error(err.message || err)
-            process.exit(1)
-            return
+            log.error(err.message || err);
+            return process.exit(1);
         }
-        log.info('bridge is now listening on %s', bindaddr);
+        log.info('bridge is now listening on "%s"', bindaddr);
     });
 
     process.once('SIGINT', function () {
