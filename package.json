@@ -1,14 +1,14 @@
 {
   "name": "busybody",
   "description": "Simple IPC library",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/goliatone/busybody",
   "author": {
     "name": "goliatone",
     "email": "hello@goliatone.com",
     "url": "http://goliatone.com"
   },
-  "bin":{
+  "bin": {
     "bsbd": "bin/cli",
     "busybody": "bin/cli"
   },
