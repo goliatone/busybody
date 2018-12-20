@@ -8,6 +8,10 @@
     "email": "hello@goliatone.com",
     "url": "http://goliatone.com"
   },
+  "bin":{
+    "bsbd": "bin/cli",
+    "busybody": "bin/cli"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/goliatone/busybody.git"
