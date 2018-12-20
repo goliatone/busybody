@@ -1,9 +1,12 @@
 #!/usr/bin/env node
+
 'use strict'
 
 const program = require('commander');
 const pkg = require('../package');
 const busybody = require('../');
+const { _isFunction } = require('../lib/utils');
+const cleanup = require('../lib/cleanup');
 const log = require('modlog')('busy');
 
 const PORT = require('..').DEFAULT_PORT;
@@ -17,11 +20,12 @@ const PORT = require('..').DEFAULT_PORT;
 
 //bsbd publish|tell    [uri] <node> --id [nodeid] --event <event> --message <hola!>
 //bsbd broadcast|shout [uri]        --id [nodeid] --event <event> --message <hola!>
-
+//bsbd -e /tmp/kiko4.sock -a tell -n 'node1:event' -m '{ "msg": "busybody_is_easy" }'
 program
     .version(pkg.version)
     .option('-b, --bridge [bindaddr]', 'run a bridge')
-    .option('-n, --node [bindaddr]', 'run a node')
+    .option('-e, --endpoint [addr]', 'Address')
+    .option('-n, --node [nodeid]', 'run a node')
     .option('-a, --action <action>', 'action tell or shout')
     .option('-m, --message <message>', 'message')
     .parse(process.argv);
@@ -41,7 +45,7 @@ if (program.bridge) {
         bindaddr = `127.0.0.1:${PORT}`;
     }
 
-    if(bindaddr.indexOf(':') > 0) {
+    if (bindaddr.indexOf(':') > 0) {
         let _tmp = bindaddr.split(':');
         cfg = {
             host: _tmp[0],
@@ -49,41 +53,91 @@ if (program.bridge) {
         };
     }
 
-    if(bindaddr.indexOf('.sock') > 0) {
-        cfg = {path: bindaddr};
+    if (bindaddr.indexOf('.sock') > 0) {
+        cfg = { path: bindaddr };
     }
 
-    var b = busybody.createBridge(cfg, function (err) {
-        if (err) {
-            log.error(err.message || err);
-            return process.exit(1);
-        }
-        log.info('bridge is now listening on "%s"', bindaddr);
+    let bridge;
+
+    function run(config) {
+        bridge = busybody.createBridge(config, function(err) {
+            if (err) {
+                log.error('Error creating bridge.');
+                log.error(err.message);
+
+                if (err.code === 'EADDRINUSE' && config.path) {
+                    bridge.close();
+                    removeSocketAndRetry(config);
+                } else {
+                    return process.exit(1);
+                }
+            }
+            log.info('bridge is now listening on "%s"', bindaddr);
+        });
+    }
+
+    run(cfg);
+
+    cleanup(code => {
+        log.info('received %s signal, closing bridge...', code);
+        bridge.close();
     });
 
-    process.once('SIGINT', function () {
-        log.info('received SIGINT signal, closing bridge...');
-        b.close();
-        process.exit(0);
-    });
-} else if(program.node){
+    function removeSocketAndRetry(config) {
+        const client = new require('net').Socket();
+
+        client.on('error', function(e) {
+            if (e.code == 'ECONNREFUSED') {
+                require('fs').unlink(config.path, err => {
+                    if (err) {
+                        log.error('Error trying to recover bridge.');
+                        log.error(err.message);
+                        process.exit(1);
+                    }
+                    run(config);
+                });
+            }
+        });
+        client.connect({ path: config.path }, _ => {
+            log.info('Server is actually running, giving up...');
+            process.exit(1);
+        });
+    }
+} else if (program.node) {
     let config = {
         path: '/tmp/kiko4.sock'
     };
 
-    let node = busybody.createNode(config, (err)=>{
+    if (program.endpoint) {
+        //todo, we should be able to send a uri and break that down 
+        //in components: pat or host:port.
+        config.path = program.endpoint;
+    }
+
+    const node = busybody.createNode(config, err => {
+
         if (err) {
-            log.error(err.message || err);
+            log.error('Error creating node.');
+            log.error(err.message);
             return process.exit(1);
         }
         log.info('node is online as ', config);
     });
-    var target = program.node;
-    var message = program.message;
-    var action = program.action;
 
-    node[action](target, message, (err, message)=>{
-        console.log(err, message);
+    const target = program.node;
+    const message = program.message;
+    const action = program.action;
+
+    if (!_isFunction(node[action])) {
+        log.warn('Action not present in node');
+        process.exit(0);
+    }
+
+    node[action](target, message, (err, message) => {
+        log.error('Error with %s:', program.action);
+        log.error('Message: %s', message);
+        log.error(err);
+
         process.exit(0);
     });
 } else {
