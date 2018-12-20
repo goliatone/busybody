@@ -18,22 +18,22 @@ const PORT = require('..').DEFAULT_PORT;
 //bsbd bridge tls://localhost:22453 we need key [cert], [ca]
 //bsbd bridge amqp://[user:pass@]localhost:22453
 
-//bsbd publish|tell    [uri] <node> --id [nodeid] --event <event> --message <hola!>
-//bsbd broadcast|shout [uri]        --id [nodeid] --event <event> --message <hola!>
-//bsbd -e /tmp/kiko4.sock -a tell -n 'node1:event' -m '{ "msg": "busybody_is_easy" }'
+//bsbd publish    [uri] <node> --id [nodeid] --event <event> --message <hola!>
+//bsbd broadcast [uri]        --id [nodeid] --event <event> --message <hola!>
+//bsbd -e /tmp/kiko4.sock -a publish -n 'node1:event' -m '{ "msg": "busybody_is_easy" }'
 program
     .version(pkg.version)
     .option('-b, --bridge [bindaddr]', 'run a bridge')
     .option('-e, --endpoint [addr]', 'Address')
     .option('-n, --node [nodeid]', 'run a node')
-    .option('-a, --action <action>', 'action tell or shout')
+    .option('-a, --action <action>', 'action publish or broadcast')
     .option('-m, --message <message>', 'message')
     .parse(process.argv);
 
 if (program.bridge) {
     log.info('initializing bridge');
 
-    var bindaddr = program.bridge;
+    let bindaddr = program.bridge;
 
     let cfg = {};
 
