@@ -58,6 +58,15 @@ server.listen('/tmp/app-monitor.sock', function() { //'listening' listener
 https://www.npmjs.com/package/nats
 https://www.npmjs.com/package/discover-tcp-transport
 
+
+```
+DEBUG=* node ./bin/cli --bridge /tmp/kiko4.sock
+DEBUG=* node example/node1.js
+DEBUG=* node example/anon.js
+DEBUG=* node example/node-shout.js
+```
+
+
 ## Getting Started
 Install the module with: `npm install busybody`
 
