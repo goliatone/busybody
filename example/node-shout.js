@@ -13,7 +13,7 @@ const node = busybody.createNode(config, function(err) {
     }
     // successfully connected to bridge
     console.log('node online!');
-    node.shout('shout_eve', 'my message');
+    node.broadcast('broadcast_eve', 'my message');
 });
 
 node.on('event', function(message, res) {
@@ -21,7 +21,7 @@ node.on('event', function(message, res) {
     console.log(message);
 
     // send a callback fig.1
-    res(null, 'this is node shout!');
+    res(null, 'this is node broadcast!');
 });
 
 function onError(e) {

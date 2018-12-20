@@ -28,8 +28,8 @@ node.on('ping', (message, res) => {
     res(null, 'pong');
 });
 
-node.on('shout_eve', (message, res) => {
-    console.log('On shout event', message);
+node.on('broadcast_eve', (message, res) => {
+    console.log('On broadcast event', message);
 });
 
 function onError(e) {

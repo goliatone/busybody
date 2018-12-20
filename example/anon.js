@@ -12,23 +12,23 @@ const anon = busybody.createNode(config, function(err) {
     console.log('somenode online!');
 });
 
-//'node1:event' "{ msg: 'busybody_is_easy' }"
-anon.tell('node1:event', { msg: 'busybody_is_easy' }, function(err, message) {
+//-e /tmp/kiko4.sock -a publish -n 'node1:event' -m '{ "msg": "busybody_is_easy" }'
+anon.publish('node1:event', { msg: 'busybody_is_easy' }, function(err, message) {
     if (err) {
         return onError(err);
     }
     console.log('node1:event response message:', message); // -> 'ilovenodejs'
 });
 
-anon.tell('node1:ping', new Date(), (err, message) => {
+anon.publish('node1:ping', new Date(), (err, message) => {
     if (err) {
         return onError(err);
     }
-    console.log('tell node1:ping response message:', message);
+    console.log('publish node1:ping response message:', message);
 });
 
-anon.on('shout_eve', (message, res) => {
-    console.log('On shout event:', message);
+anon.on('broadcast_eve', (message, res) => {
+    console.log('On broadcast event:', message);
     console.log('response:', res);
 });
 
