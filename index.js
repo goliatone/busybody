@@ -17,6 +17,5 @@ exports.createBridge = function(a, b) {
     return new Bridge(a, b);
 };
 
-
 exports.Node = Node;
 exports.Bridge = Bridge;
